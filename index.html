@@ -1,22 +1,741 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AID3D — Autonomous Injury Detection & Decision Delivery</title>
-    <meta name="description" content="AID3D predicts life-saving interventions for trauma patients using advanced AI and machine learning — built for the field, designed for the clinic." />
-    <meta name="theme-color" content="#000000" />
-    <meta property="og:title" content="AID3D — Autonomous Injury Detection & Decision Delivery" />
-    <meta property="og:description" content="Predicting life-saving interventions before the window closes — for every casualty, every setting, every stage of care." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://aid3d-triage.com" />
-    <link rel="canonical" href="https://aid3d-triage.com" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
-  </head>
-  <body class="bg-black text-white antialiased overflow-x-hidden">
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AID3D — Autonomous Intelligence for Data-Driven Discovery</title>
+<meta name="description" content="AID3D deploys autonomous research agents inside your data silo — turning proprietary datasets into publishable insights without data ever leaving your walls.">
+<meta name="theme-color" content="#07080a">
+<meta property="og:title" content="AID3D — Autonomous Intelligence for Data-Driven Discovery">
+<meta property="og:description" content="Locally-deployed research agents that live inside your data silo. From raw data to publishable findings — autonomously.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://aid3d.com">
+<link rel="canonical" href="https://aid3d.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07080a;
+    --surface: #0a0c0f;
+    --text: #c0c5cc;
+    --bright: #e0e3e8;
+    --dim: #5a5f6a;
+    --ghost: #282c34;
+    --border: rgba(255,255,255,0.04);
+    --border-hover: rgba(255,255,255,0.08);
+    --accent: #00d4ee;
+    --accent-lo: rgba(0,212,238,0.06);
+    --accent-glow: rgba(0,212,238,0.35);
+    --accent-mid: rgba(0,212,238,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Chakra Petch', sans-serif;
+    color: var(--text);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  ::selection {
+    background: rgba(0,212,238,0.2);
+    color: var(--bright);
+  }
+
+  /* ── Canvas ── */
+  #bg { position: fixed; inset: 0; z-index: 0; will-change: transform; }
+
+  /* ── Noise ── */
+  .noise {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.028;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  .wash {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: radial-gradient(ellipse 50% 40% at 50% 0%, rgba(0,212,238,0.02) 0%, transparent 100%);
+  }
+
+  /* ── Page ── */
+  main { position: relative; z-index: 3; }
+
+  /* ── Hero ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 80px 32px;
+    position: relative;
+  }
+
+  /* Logo */
+  .logo-mark {
+    margin-bottom: 40px;
+    opacity: 0; transform: translateY(12px);
+    animation: up 1.2s cubic-bezier(0.16,1,0.3,1) 0.3s forwards;
+  }
+
+  .wordmark {
+    font-size: clamp(40px, 6vw, 76px);
+    font-weight: 700;
+    letter-spacing: clamp(12px, 2.5vw, 28px);
+    padding-left: clamp(12px, 2.5vw, 28px);
+    color: var(--bright);
+    line-height: 1;
+    margin-bottom: 16px;
+    opacity: 0; transform: translateY(12px);
+    animation: up 1.2s cubic-bezier(0.16,1,0.3,1) 0.55s forwards;
+  }
+
+  .tagline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(10px, 1.1vw, 12px);
+    font-weight: 400;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 52px;
+    opacity: 0; transform: translateY(12px);
+    animation: up 1.2s cubic-bezier(0.16,1,0.3,1) 0.8s forwards;
+  }
+
+  .hero-line {
+    font-size: clamp(14px, 1.5vw, 17px);
+    font-weight: 300;
+    color: var(--dim);
+    max-width: 560px;
+    line-height: 2;
+    letter-spacing: 0.3px;
+    opacity: 0; transform: translateY(12px);
+    animation: up 1.2s cubic-bezier(0.16,1,0.3,1) 1.05s forwards;
+  }
+  .hero-line em { font-style: normal; color: var(--text); font-weight: 400; }
+
+  .scroll-cue {
+    position: absolute; bottom: 44px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0; animation: fade 1.5s ease 2.4s forwards;
+  }
+  .scroll-cue .bar {
+    width: 1px; height: 32px;
+    background: linear-gradient(to bottom, var(--ghost), transparent);
+    animation: pulse 2.4s ease-in-out 2.4s infinite;
+  }
+  .scroll-cue span {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8px; letter-spacing: 4px; text-transform: uppercase; color: var(--ghost);
+  }
+
+  /* ── Content sections ── */
+  .content { max-width: 960px; margin: 0 auto; padding: 0 40px 100px; }
+
+  /* ── Section labels ── */
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--ghost);
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--ghost);
+  }
+
+  /* ── Pillars (2-col) ── */
+  .pillars {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--ghost);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 120px;
+  }
+
+  .pillar {
+    padding: 52px 44px;
+    background: var(--bg);
+    display: flex; flex-direction: column; gap: 18px;
+    transition: background 0.5s ease;
+    position: relative;
+  }
+  .pillar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
+  }
+  .pillar:hover { background: var(--surface); }
+  .pillar:hover::before { width: 100%; }
+
+  .pillar-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; font-weight: 400;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--ghost);
+    display: flex; align-items: center; gap: 10px;
+    transition: color 0.4s;
+  }
+  .pillar:hover .pillar-label { color: var(--dim); }
+  .pillar-label::before {
+    content: ''; width: 16px; height: 1px;
+    background: var(--ghost); transition: background 0.4s, width 0.4s;
+  }
+  .pillar:hover .pillar-label::before { background: var(--accent); width: 22px; }
+
+  .pillar-title {
+    font-size: clamp(17px, 1.8vw, 22px);
+    font-weight: 600; letter-spacing: 0.8px;
+    color: var(--dim); transition: color 0.4s;
+  }
+  .pillar:hover .pillar-title { color: var(--bright); }
+
+  .pillar-desc {
+    font-size: 12.5px; font-weight: 300; line-height: 1.95;
+    color: var(--ghost); transition: color 0.4s;
+    max-width: 320px;
+  }
+  .pillar:hover .pillar-desc { color: var(--dim); }
+
+  /* ── Agent Pipeline (6-step) ── */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--ghost);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 120px;
+  }
+
+  .pipe-step {
+    padding: 40px 32px;
+    background: var(--bg);
+    display: flex; flex-direction: column; gap: 14px;
+    transition: background 0.5s ease;
+    position: relative;
+  }
+  .pipe-step::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 0; height: 1px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
+  }
+  .pipe-step:hover { background: var(--surface); }
+  .pipe-step:hover::before { width: 100%; }
+
+  .pipe-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; font-weight: 400;
+    letter-spacing: 3px;
+    color: var(--ghost);
+    transition: color 0.4s;
+  }
+  .pipe-step:hover .pipe-num { color: var(--accent); }
+
+  .pipe-title {
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--dim); transition: color 0.4s;
+  }
+  .pipe-step:hover .pipe-title { color: var(--bright); }
+
+  .pipe-desc {
+    font-size: 11.5px; font-weight: 300; line-height: 1.85;
+    color: var(--ghost); transition: color 0.4s;
+  }
+  .pipe-step:hover .pipe-desc { color: var(--dim); }
+
+  /* ── Domains (3-col) ── */
+  .domains {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 120px;
+  }
+
+  .domain {
+    padding: 48px 28px 48px 0;
+    position: relative;
+    transition: all 0.4s;
+  }
+  .domain + .domain { padding-left: 28px; border-left: 1px solid var(--border); }
+  .domain::after {
+    content: ''; position: absolute; bottom: 0; left: 0;
+    width: 0; height: 1px; background: var(--border-hover);
+    transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
+  }
+  .domain:hover::after { width: 100%; }
+
+  .domain-icon { opacity: 0.3; transition: opacity 0.4s; margin-bottom: 22px; }
+  .domain:hover .domain-icon { opacity: 0.85; }
+
+  .domain-title {
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--dim); margin-bottom: 10px; transition: color 0.4s;
+  }
+  .domain:hover .domain-title { color: var(--bright); }
+
+  .domain-desc {
+    font-size: 11.5px; font-weight: 300; line-height: 1.85;
+    color: var(--ghost); transition: color 0.4s;
+  }
+  .domain:hover .domain-desc { color: var(--dim); }
+
+  /* ── Differentiator block ── */
+  .diff-block {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 56px 48px;
+    background: var(--surface);
+    margin-bottom: 120px;
+    position: relative;
+    overflow: hidden;
+  }
+  .diff-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-mid), transparent);
+  }
+
+  .diff-title {
+    font-size: clamp(16px, 1.6vw, 20px);
+    font-weight: 600;
+    color: var(--bright);
+    letter-spacing: 0.5px;
+    margin-bottom: 24px;
+  }
+
+  .diff-text {
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 2;
+    color: var(--dim);
+    max-width: 680px;
+  }
+  .diff-text em {
+    font-style: normal;
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  /* ── Prompt example ── */
+  .prompt-example {
+    margin-top: 32px;
+    padding: 24px 28px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    line-height: 1.9;
+    color: var(--dim);
+    letter-spacing: 0.3px;
+  }
+  .prompt-example .prompt-caret {
+    color: var(--accent);
+    opacity: 0.6;
+    margin-right: 8px;
+  }
+
+  /* ── Contact bar ── */
+  .contact-bar {
+    text-align: center;
+    padding: 64px 0 40px;
+    border-top: 1px solid var(--border);
+  }
+
+  .contact-bar .contact-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--ghost);
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .contact-bar a {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; font-weight: 400;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--dim); text-decoration: none;
+    transition: color 0.3s, text-shadow 0.3s;
+    position: relative;
+  }
+  .contact-bar a:hover {
+    color: var(--accent);
+    text-shadow: 0 0 20px rgba(0,212,238,0.2);
+  }
+  .contact-bar a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--accent);
+    transition: width 0.4s cubic-bezier(0.16,1,0.3,1);
+  }
+  .contact-bar a:hover::after { width: 100%; }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 0 40px 48px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .footer p {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--ghost);
+  }
+
+  /* ── Scroll reveal ── */
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 1s cubic-bezier(0.16,1,0.3,1), transform 1s cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal.vis { opacity: 1; transform: translateY(0); }
+
+  /* ── Keyframes ── */
+  @keyframes up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pulse { 0%,100% { opacity: 0.15; } 50% { opacity: 0.6; } }
+  
+  /* Inverted Dash Animation */
+  @keyframes ekgDash { 
+    0% { stroke-dashoffset: 280; } 
+    50% { stroke-dashoffset: 0; } 
+    100% { stroke-dashoffset: -280; } 
+  }
+  
+  @keyframes logoBreath {
+    0%,100% { filter: drop-shadow(0 0 4px rgba(0,212,238,0.12)); }
+    50% { filter: drop-shadow(0 0 14px rgba(0,212,238,0.28)); }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .pillars { grid-template-columns: 1fr; }
+    .pillar { padding: 40px 32px; }
+    .pipeline { grid-template-columns: 1fr; }
+    .pipe-step { padding: 32px 28px; }
+    .domains { grid-template-columns: 1fr; }
+    .domain + .domain {
+      padding-left: 0;
+      border-left: none;
+      border-top: 1px solid var(--border);
+      padding-top: 32px;
+    }
+    .diff-block { padding: 40px 28px; }
+    .content { padding: 0 24px 80px; }
+    .hero { padding: 60px 24px; }
+  }
+
+  @media (max-width: 480px) {
+    .wordmark { letter-spacing: 8px; padding-left: 8px; }
+    .tagline { letter-spacing: 3px; font-size: 9px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+<div class="noise"></div>
+<div class="wash"></div>
+
+<main>
+  <section class="hero">
+
+    <div class="logo-mark">
+      <svg width="92" height="92" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: logoBreath 5s ease-in-out infinite;">
+        <defs>
+          <filter id="g" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="2" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <polygon points="44,10 78,28 44,46 10,28" fill="none" stroke="#3a3f48" stroke-width="0.7" stroke-linejoin="round"/>
+        <polygon points="10,28 44,46 44,78 10,60" fill="none" stroke="#2a2e36" stroke-width="0.7" stroke-linejoin="round"/>
+        <polygon points="78,28 78,60 44,78 44,46" fill="none" stroke="#30343c" stroke-width="0.7" stroke-linejoin="round"/>
+
+        <line x1="44" y1="10" x2="44" y2="46" stroke="#2a2e36" stroke-width="0.4"/>
+        <line x1="10" y1="28" x2="44" y2="46" stroke="#2a2e36" stroke-width="0.4"/>
+        <line x1="78" y1="28" x2="44" y2="46" stroke="#2a2e36" stroke-width="0.4"/>
+
+        <circle cx="27" cy="36" r="2" fill="var(--accent)" opacity="0.4"/>
+        <circle cx="61" cy="36" r="2" fill="var(--accent)" opacity="0.3"/>
+        <circle cx="44" cy="62" r="2" fill="var(--accent)" opacity="0.35"/>
+
+        <line x1="27" y1="36" x2="44" y2="46" stroke="var(--accent)" stroke-width="0.6" opacity="0.25"/>
+        <line x1="61" y1="36" x2="44" y2="46" stroke="var(--accent)" stroke-width="0.6" opacity="0.25"/>
+        <line x1="44" y1="62" x2="44" y2="46" stroke="var(--accent)" stroke-width="0.6" opacity="0.25"/>
+
+        <polyline
+          points="8,44 14,44 20,36 26,54 34,26 42,60 50,32 58,50 66,44 80,44"
+          stroke="var(--accent)" stroke-width="1.2" fill="none"
+          stroke-linecap="round" stroke-linejoin="round"
+          stroke-dasharray="280" stroke-dashoffset="280"
+          style="animation: ekgDash 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;"
+          opacity="0.85" filter="url(#g)"/>
+
+        <circle cx="44" cy="46" r="2.5" fill="var(--accent)" opacity="0.45"/>
+      </svg>
+    </div>
+
+    <h1 class="wordmark">AID3D</h1>
+    <p class="tagline">Autonomous Intelligence for Data-Driven Discovery</p>
+
+    <p class="hero-line">
+      <em>Research agents</em> deployed inside your data silo — turning <em>proprietary datasets</em> into publishable findings without data ever leaving your walls.
+    </p>
+
+    <div class="scroll-cue">
+      <div class="bar"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <div class="content">
+
+    <div class="section-label reveal">Core Architecture</div>
+
+    <div class="pillars reveal">
+      <div class="pillar">
+        <div class="pillar-label">Engine</div>
+        <h2 class="pillar-title">Agentic Research Pipeline</h2>
+        <p class="pillar-desc">An autonomous agent loop that decomposes natural-language research prompts into executable plans — from exploratory data analysis through model training to publication-ready reports.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-label">Engine</div>
+        <h2 class="pillar-title">On-Premise Deployment</h2>
+        <p class="pillar-desc">Ships as a containerized stack onto your DGX or GPU cluster. Data never leaves the building. Air-gapped, HIPAA-aligned, designed for organizations that cannot move their data to the cloud.</p>
+      </div>
+    </div>
+
+    <div class="section-label reveal">The Agent Pipeline</div>
+
+    <div class="pipeline reveal">
+      <div class="pipe-step">
+        <div class="pipe-num">01</div>
+        <h3 class="pipe-title">Planner</h3>
+        <p class="pipe-desc">Receives natural-language research objectives. Decomposes into a multi-step plan with checkpoints and human-review gates.</p>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">02</div>
+        <h3 class="pipe-title">EDA Agent</h3>
+        <p class="pipe-desc">Profiles distributions, missingness, target leakage, class imbalance. Generates visualizations and a data quality report before any modeling begins.</p>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">03</div>
+        <h3 class="pipe-title">Feature Engineering</h3>
+        <p class="pipe-desc">Domain-aware feature creation. Understands clinical hierarchies, spectral transforms, ICD codes, OMOP CDM, genomic variant encoding, and time-to-event structures.</p>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">04</div>
+        <h3 class="pipe-title">Modeling Agent</h3>
+        <p class="pipe-desc">Writes and executes real code — XGBoost, LightGBM, PyTorch, TensorFlow. Iterates on hyperparameters, compares architectures, and explains why one approach outperformed another.</p>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">05</div>
+        <h3 class="pipe-title">Evaluation</h3>
+        <p class="pipe-desc">Beyond accuracy. Calibration curves, fairness metrics, subgroup analysis, clinical utility, decision curves, and FDA-ready model cards and validation documentation.</p>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">06</div>
+        <h3 class="pipe-title">Report Agent</h3>
+        <p class="pipe-desc">Produces publication-quality outputs — LaTeX manuscripts, executive summaries, interactive dashboards — with proper citations and full reproducibility artifacts.</p>
+      </div>
+    </div>
+
+    <div class="diff-block reveal">
+      <h2 class="diff-title">Not AutoML. A Research Teammate.</h2>
+      <p class="diff-text">
+        Existing platforms optimize for <em>speed-to-deployment</em>. We optimize for <em>research depth</em>. AID3D doesn't drag-and-drop a model — it reasons about your data, proposes hypotheses you haven't considered, runs overnight experiments, and presents findings in the morning. It maintains a <em>research backlog</em> your team can prioritize. It's the scaling function for organizations sitting on massive data lakes with more questions than data scientists.
+      </p>
+      <div class="prompt-example">
+        <div><span class="prompt-caret">›</span> Build the highest quality gradient boosting model for this signals data.</div>
+        <div><span class="prompt-caret">›</span> Now create a deep learning model and see if you can beat it.</div>
+        <div><span class="prompt-caret">›</span> Write up the comparison as a methods section with proper statistical tests.</div>
+      </div>
+    </div>
+
+    <div class="section-label reveal">Target Domains</div>
+
+    <div class="domains reveal">
+      <div class="domain">
+        <svg class="domain-icon" width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+          <rect x="10" y="2" width="16" height="10" rx="5" stroke="var(--dim)" stroke-width="0.8" fill="none"/>
+          <path d="M4 16 C4 12 8 10 12 10 L24 10 C28 10 32 12 32 16 L32 30 C32 32 30 34 28 34 L8 34 C6 34 4 32 4 30 Z" stroke="var(--dim)" stroke-width="0.8" fill="none"/>
+          <line x1="18" y1="14" x2="18" y2="20" stroke="var(--accent)" stroke-width="1" opacity="0.6"/>
+          <line x1="15" y1="17" x2="21" y2="17" stroke="var(--accent)" stroke-width="1" opacity="0.6"/>
+        </svg>
+        <h3 class="domain-title">Healthcare &amp; Clinical</h3>
+        <p class="domain-desc">EHR data, clinical signals, imaging features, and patient outcomes — research pipelines that run inside hospital data silos.</p>
+      </div>
+
+      <div class="domain">
+        <svg class="domain-icon" width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+          <circle cx="18" cy="14" r="8" stroke="var(--dim)" stroke-width="0.8" fill="none"/>
+          <circle cx="18" cy="14" r="3" stroke="var(--accent)" stroke-width="0.6" fill="none" opacity="0.5"/>
+          <path d="M10 26 C10 22 14 20 18 20 C22 20 26 22 26 26 L26 32 L10 32 Z" stroke="var(--dim)" stroke-width="0.8" fill="none"/>
+        </svg>
+        <h3 class="domain-title">Pharma &amp; Biotech</h3>
+        <p class="domain-desc">Genomics, proteomics, drug response data, and clinical trial analytics on proprietary compound libraries.</p>
+      </div>
+
+      <div class="domain">
+        <svg class="domain-icon" width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+          <rect x="6" y="8" width="24" height="20" rx="2" stroke="var(--dim)" stroke-width="0.8" fill="none"/>
+          <line x1="6" y1="14" x2="30" y2="14" stroke="var(--dim)" stroke-width="0.6"/>
+          <polyline points="10,22 14,18 18,24 22,16 26,20" stroke="var(--accent)" stroke-width="0.8" fill="none" opacity="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3 class="domain-title">Life Sciences Research</h3>
+        <p class="domain-desc">Multi-omics integration, signals processing, and large-scale observational study analysis with regulatory-grade documentation.</p>
+      </div>
+    </div>
+
+    <div class="contact-bar reveal">
+      <span class="contact-label">Get in touch</span>
+      <a href="mailto:contact@aid3d-triage.com">contact@aid3d-triage.com</a>
+    </div>
+
+  </div>
+</main>
+
+<div class="footer">
+  <p>&copy; 2026 AID3D &mdash; All rights reserved</p>
+</div>
+
+<script>
+// ─── Minimal particle field ───
+(function(){
+  const c = document.getElementById('bg');
+  const x = c.getContext('2d');
+  let w, h, pts = [];
+  let raf;
+
+  function sz(){
+    w = c.width = innerWidth;
+    h = c.height = innerHeight;
+  }
+  sz();
+  window.addEventListener('resize', sz);
+
+  const N = Math.min(45, Math.floor(innerWidth / 30));
+  const D = 150;
+
+  for(let i = 0; i < N; i++){
+    pts.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.18,
+      vy: (Math.random() - 0.5) * 0.18,
+      r: Math.random() * 1.2 + 0.3,
+      o: Math.random() * 0.12 + 0.04
+    });
+  }
+
+  let mx = -999, my = -999;
+  document.addEventListener('mousemove', function(e){
+    mx = e.clientX;
+    my = e.clientY;
+  });
+
+  function loop(){
+    x.clearRect(0, 0, w, h);
+    for(let i = 0; i < pts.length; i++){
+      const p = pts[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      if(p.x < 0 || p.x > w) p.vx *= -1;
+      if(p.y < 0 || p.y > h) p.vy *= -1;
+
+      const dx = p.x - mx, dy = p.y - my, dd = Math.sqrt(dx * dx + dy * dy);
+      if(dd < 120){ p.x += dx * 0.006; p.y += dy * 0.006; }
+
+      x.beginPath();
+      x.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      x.fillStyle = 'rgba(0,212,238,' + p.o + ')';
+      x.fill();
+
+      for(let j = i + 1; j < pts.length; j++){
+        const q = pts[j], d = Math.hypot(p.x - q.x, p.y - q.y);
+        if(d < D){
+          x.beginPath();
+          x.moveTo(p.x, p.y);
+          x.lineTo(q.x, q.y);
+          x.strokeStyle = 'rgba(0,212,238,' + (0.035 * (1 - d / D)) + ')';
+          x.lineWidth = 0.4;
+          x.stroke();
+        }
+      }
+    }
+    raf = requestAnimationFrame(loop);
+  }
+  loop();
+
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){ cancelAnimationFrame(raf); }
+    else { loop(); }
+  });
+})();
+
+// ─── Scroll reveal ───
+(function(){
+  const els = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('vis');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  els.forEach(function(el){ observer.observe(el); });
+})();
+
+// ─── Smooth scroll-cue fade on scroll ───
+(function(){
+  const cue = document.querySelector('.scroll-cue');
+  if(!cue) return;
+  window.addEventListener('scroll', function(){
+    const t = Math.min(window.scrollY / 300, 1);
+    cue.style.opacity = 1 - t;
+  }, { passive: true });
+})();
+</script>
+
+</body>
 </html>
