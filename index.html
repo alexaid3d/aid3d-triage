@@ -1,36 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AID3D — Autonomous Injury Detection & Decision Delivery</title>
+<title>AID3D — Autonomous Injury Detection &amp; Decision Delivery</title>
 <meta name="description" content="AID3D predicts life-saving interventions for trauma patients using advanced AI and machine learning — built for the field, designed for the clinic.">
 <meta name="theme-color" content="#07080a">
-<meta property="og:title" content="AID3D — Autonomous Injury Detection & Decision Delivery">
+<meta property="og:title" content="AID3D — Autonomous Injury Detection &amp; Decision Delivery">
 <meta property="og:description" content="Predicting life-saving interventions before the window closes — for every casualty, every setting, every stage of care.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://aid3d-triage.com">
 <link rel="canonical" href="https://aid3d-triage.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&amp;family=IBM+Plex+Mono:wght@300;400;500&amp;display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #07080a;
-    --surface: #0a0c0f;
+    --bg-soft: #090b0e;
+    --surface: #0b0d11;
+    --surface-2: #0e1116;
     --text: #c0c5cc;
-    --bright: #e0e3e8;
-    --dim: #5a5f6a;
-    --ghost: #282c34;
-    --border: rgba(255,255,255,0.04);
-    --border-hover: rgba(255,255,255,0.08);
+    --bright: #eef1f5;
+    --dim: #6b7280;
+    --ghost: #353a44;
+    --line: rgba(255,255,255,0.06);
+    --line-2: rgba(255,255,255,0.10);
     --accent: #00d4ee;
+    --accent-2: #38f0c9;
     --accent-lo: rgba(0,212,238,0.06);
-    --accent-glow: rgba(0,212,238,0.35);
-    --accent-mid: rgba(0,212,238,0.12);
+    --accent-mid: rgba(0,212,238,0.16);
+    --accent-glow: rgba(0,212,238,0.38);
   }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
 
   body {
@@ -41,28 +42,79 @@
     line-height: 1.6;
   }
 
-  ::selection {
-    background: rgba(0,212,238,0.2);
-    color: var(--bright);
+  ::selection { background: rgba(0,212,238,0.22); color: var(--bright); }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* ── Background layers ── */
+  #bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+  .grid-overlay {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.5;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 30%, #000 30%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 30%, #000 30%, transparent 100%);
   }
 
-  /* ── Canvas ── */
-  #bg { position: fixed; inset: 0; z-index: 0; will-change: transform; }
-
-  /* ── Noise ── */
   .noise {
-    position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.028;
+    position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0.03;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-size: 200px 200px;
   }
 
   .wash {
     position: fixed; inset: 0; z-index: 1; pointer-events: none;
-    background: radial-gradient(ellipse 50% 40% at 50% 0%, rgba(0,212,238,0.02) 0%, transparent 100%);
+    background:
+      radial-gradient(ellipse 60% 50% at 50% -5%, rgba(0,212,238,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 85% 110%, rgba(56,240,201,0.03) 0%, transparent 60%);
   }
 
-  /* ── Page ── */
   main { position: relative; z-index: 3; }
+
+  /* ── Nav ── */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px clamp(20px, 5vw, 56px);
+    transition: background 0.4s, border-color 0.4s, backdrop-filter 0.4s;
+    border-bottom: 1px solid transparent;
+  }
+  .nav.scrolled {
+    background: rgba(7,8,10,0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-brand { display: flex; align-items: center; gap: 12px; }
+  .nav-brand svg { display: block; }
+  .nav-brand .nb-word {
+    font-weight: 700; font-size: 16px; letter-spacing: 5px; color: var(--bright);
+    padding-left: 5px;
+  }
+  .nav-links { display: flex; align-items: center; gap: 36px; }
+  .nav-links a {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim);
+    transition: color 0.3s; position: relative;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--bright) !important;
+    border: 1px solid var(--line-2);
+    padding: 9px 18px; border-radius: 3px;
+    transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+  }
+  .nav-cta:hover {
+    border-color: var(--accent-mid);
+    background: var(--accent-lo);
+    box-shadow: 0 0 24px rgba(0,212,238,0.12);
+  }
+  @media (max-width: 720px) { .nav-links a:not(.nav-cta) { display: none; } }
 
   /* ── Hero ── */
   .hero {
@@ -70,25 +122,43 @@
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     text-align: center;
-    padding: 80px 32px;
+    padding: 120px 32px 80px;
     position: relative;
   }
 
-  /* Logo */
-  .logo-mark {
-    margin-bottom: 40px;
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim);
+    border: 1px solid var(--line); border-radius: 100px;
+    padding: 7px 16px 7px 14px; margin-bottom: 40px;
+    background: rgba(255,255,255,0.015);
     opacity: 0; transform: translateY(12px);
-    animation: up 1.2s cubic-bezier(0.16,1,0.3,1) 0.3s forwards;
+    animation: up 1.2s cubic-bezier(0.16,1,0.3,1) 0.2s forwards;
+  }
+  .hero-badge .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow);
+    animation: blink 2.4s ease-in-out infinite;
+  }
+
+  .logo-mark {
+    margin-bottom: 34px;
+    opacity: 0; transform: translateY(12px);
+    animation: up 1.2s cubic-bezier(0.16,1,0.3,1) 0.35s forwards;
   }
 
   .wordmark {
-    font-size: clamp(40px, 6vw, 76px);
+    font-size: clamp(44px, 7vw, 92px);
     font-weight: 700;
     letter-spacing: clamp(12px, 2.5vw, 28px);
     padding-left: clamp(12px, 2.5vw, 28px);
     color: var(--bright);
     line-height: 1;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
+    background: linear-gradient(180deg, #ffffff 0%, #aeb6c2 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
     opacity: 0; transform: translateY(12px);
     animation: up 1.2s cubic-bezier(0.16,1,0.3,1) 0.55s forwards;
   }
@@ -96,34 +166,53 @@
   .tagline {
     font-family: 'IBM Plex Mono', monospace;
     font-size: clamp(10px, 1.1vw, 12px);
-    font-weight: 400;
-    letter-spacing: 5px;
-    text-transform: uppercase;
-    color: var(--dim);
-    margin-bottom: 52px;
+    font-weight: 400; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--dim); margin-bottom: 44px;
     opacity: 0; transform: translateY(12px);
-    animation: up 1.2s cubic-bezier(0.16,1,0.3,1) 0.8s forwards;
+    animation: up 1.2s cubic-bezier(0.16,1,0.3,1) 0.75s forwards;
   }
 
   .hero-line {
-    font-size: clamp(14px, 1.5vw, 17px);
-    font-weight: 300;
-    color: var(--dim);
-    max-width: 560px;
-    line-height: 2;
-    letter-spacing: 0.3px;
+    font-size: clamp(16px, 1.7vw, 21px);
+    font-weight: 300; color: var(--text);
+    max-width: 620px; line-height: 1.85; letter-spacing: 0.3px;
     opacity: 0; transform: translateY(12px);
-    animation: up 1.2s cubic-bezier(0.16,1,0.3,1) 1.05s forwards;
+    animation: up 1.2s cubic-bezier(0.16,1,0.3,1) 0.95s forwards;
   }
-  .hero-line em { font-style: normal; color: var(--text); font-weight: 400; }
+  .hero-line em { font-style: normal; color: var(--bright); font-weight: 500; }
+
+  .hero-actions {
+    display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+    margin-top: 44px;
+    opacity: 0; transform: translateY(12px);
+    animation: up 1.2s cubic-bezier(0.16,1,0.3,1) 1.15s forwards;
+  }
+  .btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase;
+    padding: 14px 28px; border-radius: 3px; transition: all 0.35s; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .btn-primary {
+    background: var(--accent); color: #04181c; font-weight: 500;
+    box-shadow: 0 0 0 rgba(0,212,238,0);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 0 32px rgba(0,212,238,0.35);
+    transform: translateY(-2px);
+  }
+  .btn-ghost {
+    border: 1px solid var(--line-2); color: var(--text);
+  }
+  .btn-ghost:hover { border-color: var(--accent-mid); color: var(--bright); background: var(--accent-lo); }
 
   .scroll-cue {
-    position: absolute; bottom: 44px; left: 50%; transform: translateX(-50%);
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
     display: flex; flex-direction: column; align-items: center; gap: 8px;
-    opacity: 0; animation: fade 1.5s ease 2.4s forwards;
+    opacity: 0; animation: fade 1.5s ease 2.2s forwards;
   }
   .scroll-cue .bar {
-    width: 1px; height: 32px;
+    width: 1px; height: 34px;
     background: linear-gradient(to bottom, var(--ghost), transparent);
     animation: pulse 2.4s ease-in-out 2.4s infinite;
   }
@@ -132,384 +221,326 @@
     font-size: 8px; letter-spacing: 4px; text-transform: uppercase; color: var(--ghost);
   }
 
-  /* ── Content sections ── */
-  .content { max-width: 960px; margin: 0 auto; padding: 0 40px 100px; }
+  /* ── Marquee strip ── */
+  .strip {
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    background: var(--bg-soft);
+    overflow: hidden; position: relative;
+  }
+  .strip-track {
+    display: flex; gap: 64px; white-space: nowrap;
+    padding: 18px 0; width: max-content;
+    animation: marquee 32s linear infinite;
+  }
+  .strip-track span {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--ghost);
+    display: inline-flex; align-items: center; gap: 18px;
+  }
+  .strip-track span::after { content: '✦'; color: var(--accent); opacity: 0.35; }
 
-  /* ── Section labels ── */
+  /* ── Sections ── */
+  .content { max-width: 1080px; margin: 0 auto; padding: 110px clamp(24px, 5vw, 40px); }
+  .section-head { margin-bottom: 56px; max-width: 720px; }
   .section-label {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--ghost);
-    margin-bottom: 40px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    font-size: 10px; font-weight: 500; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 22px;
+    display: flex; align-items: center; gap: 12px;
   }
-  .section-label::before {
-    content: '';
-    width: 24px;
-    height: 1px;
-    background: var(--ghost);
+  .section-label::before { content: ''; width: 28px; height: 1px; background: var(--accent); opacity: 0.5; }
+  .section-title {
+    font-size: clamp(26px, 3.4vw, 40px); font-weight: 600; letter-spacing: 0.3px;
+    color: var(--bright); line-height: 1.2; margin-bottom: 18px;
   }
+  .section-sub { font-size: clamp(14px, 1.4vw, 16px); font-weight: 300; color: var(--dim); line-height: 1.8; }
 
-  /* ── Pillars (2-col) ── */
-  .pillars {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: var(--ghost);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 120px;
-  }
-
+  /* ── Pillars ── */
+  .pillars { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .pillar {
-    padding: 52px 44px;
-    background: var(--bg);
-    display: flex; flex-direction: column; gap: 18px;
-    transition: background 0.5s ease;
-    position: relative;
+    padding: 44px 40px; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 6px;
+    display: flex; flex-direction: column; gap: 16px;
+    transition: border-color 0.45s, transform 0.45s, background 0.45s;
+    position: relative; overflow: hidden;
   }
   .pillar::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 0; height: 2px;
+    content: ''; position: absolute; top: 0; left: 0; width: 0; height: 2px;
     background: linear-gradient(90deg, var(--accent), transparent);
     transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
   }
-  .pillar:hover { background: var(--surface); }
+  .pillar:hover { border-color: var(--line-2); background: var(--surface-2); transform: translateY(-3px); }
   .pillar:hover::before { width: 100%; }
-
+  .pillar-icon {
+    width: 44px; height: 44px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent-lo); border: 1px solid var(--line); color: var(--accent);
+    margin-bottom: 6px;
+  }
   .pillar-label {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px; font-weight: 400;
-    letter-spacing: 3px; text-transform: uppercase;
-    color: var(--ghost);
-    display: flex; align-items: center; gap: 10px;
-    transition: color 0.4s;
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim);
   }
-  .pillar:hover .pillar-label { color: var(--dim); }
-  .pillar-label::before {
-    content: ''; width: 16px; height: 1px;
-    background: var(--ghost); transition: background 0.4s, width 0.4s;
-  }
-  .pillar:hover .pillar-label::before { background: var(--accent); width: 22px; }
+  .pillar-title { font-size: clamp(19px, 2vw, 24px); font-weight: 600; letter-spacing: 0.5px; color: var(--bright); }
+  .pillar-desc { font-size: 13.5px; font-weight: 300; line-height: 1.9; color: var(--dim); max-width: 360px; }
 
-  .pillar-title {
-    font-size: clamp(17px, 1.8vw, 22px);
-    font-weight: 600; letter-spacing: 0.8px;
-    color: var(--dim); transition: color 0.4s;
-  }
-  .pillar:hover .pillar-title { color: var(--bright); }
-
-  .pillar-desc {
-    font-size: 12.5px; font-weight: 300; line-height: 1.95;
-    color: var(--ghost); transition: color 0.4s;
-    max-width: 320px;
-  }
-  .pillar:hover .pillar-desc { color: var(--dim); }
-
-  /* ── Agent Pipeline (6-step) ── */
-  .pipeline {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: var(--ghost);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 120px;
-  }
-
+  /* ── Pipeline ── */
+  .pipeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
   .pipe-step {
-    padding: 40px 32px;
-    background: var(--bg);
+    padding: 36px 30px; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 6px;
     display: flex; flex-direction: column; gap: 14px;
-    transition: background 0.5s ease;
-    position: relative;
+    transition: border-color 0.45s, transform 0.45s, background 0.45s; position: relative;
   }
-  .pipe-step::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 0; height: 1px;
-    background: linear-gradient(90deg, var(--accent), transparent);
-    transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
-  }
-  .pipe-step:hover { background: var(--surface); }
-  .pipe-step:hover::before { width: 100%; }
-
+  .pipe-step:hover { border-color: var(--line-2); background: var(--surface-2); transform: translateY(-3px); }
   .pipe-num {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500;
+    letter-spacing: 2px; color: var(--accent);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .pipe-num::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+  .pipe-title { font-size: 14px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--bright); }
+  .pipe-desc { font-size: 12.5px; font-weight: 300; line-height: 1.9; color: var(--dim); }
+
+  /* ── LSI tags ── */
+  .lsi-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 48px; }
+  .lsi-tag {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px; font-weight: 400;
-    letter-spacing: 3px;
-    color: var(--ghost);
-    transition: color 0.4s;
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text);
+    padding: 11px 18px; border: 1px solid var(--line); border-radius: 100px;
+    background: var(--surface); transition: all 0.35s;
+    display: inline-flex; align-items: center; gap: 9px;
   }
-  .pipe-step:hover .pipe-num { color: var(--accent); }
+  .lsi-tag .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+  .lsi-tag:hover { border-color: var(--accent-mid); color: var(--bright); background: var(--accent-lo); }
 
-  .pipe-title {
-    font-size: 13px; font-weight: 600;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--dim); transition: color 0.4s;
-  }
-  .pipe-step:hover .pipe-title { color: var(--bright); }
-
-  .pipe-desc {
-    font-size: 11.5px; font-weight: 300; line-height: 1.85;
-    color: var(--ghost); transition: color 0.4s;
-  }
-  .pipe-step:hover .pipe-desc { color: var(--dim); }
-
-  /* ── Domains (3-col) ── */
-  .domains {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 120px;
-  }
-
+  /* ── Domains ── */
+  .domains { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
   .domain {
-    padding: 48px 28px 48px 0;
-    position: relative;
-    transition: all 0.4s;
+    padding: 40px 32px; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--surface); transition: all 0.45s; position: relative; overflow: hidden;
   }
-  .domain + .domain { padding-left: 28px; border-left: 1px solid var(--border); }
-  .domain::after {
-    content: ''; position: absolute; bottom: 0; left: 0;
-    width: 0; height: 1px; background: var(--border-hover);
-    transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
+  .domain:hover { border-color: var(--line-2); transform: translateY(-3px); }
+  .domain-icon {
+    width: 40px; height: 40px; color: var(--accent); opacity: 0.5; transition: opacity 0.4s; margin-bottom: 22px;
   }
-  .domain:hover::after { width: 100%; }
+  .domain:hover .domain-icon { opacity: 1; }
+  .domain-title { font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--bright); margin-bottom: 12px; }
+  .domain-desc { font-size: 12.5px; font-weight: 300; line-height: 1.9; color: var(--dim); }
 
-  .domain-icon { opacity: 0.3; transition: opacity 0.4s; margin-bottom: 22px; }
-  .domain:hover .domain-icon { opacity: 0.85; }
-
-  .domain-title {
-    font-size: 12px; font-weight: 600;
-    letter-spacing: 2.5px; text-transform: uppercase;
-    color: var(--dim); margin-bottom: 10px; transition: color 0.4s;
+  /* ── Stats ── */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+    background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden;
   }
-  .domain:hover .domain-title { color: var(--bright); }
-
-  .domain-desc {
-    font-size: 11.5px; font-weight: 300; line-height: 1.85;
-    color: var(--ghost); transition: color 0.4s;
+  .stat { background: var(--surface); padding: 40px 28px; text-align: center; }
+  .stat-num {
+    font-size: clamp(34px, 4vw, 48px); font-weight: 700; color: var(--bright);
+    line-height: 1; margin-bottom: 12px;
+    background: linear-gradient(180deg, var(--accent) 0%, var(--accent-2) 120%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   }
-  .domain:hover .domain-desc { color: var(--dim); }
+  .stat-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
 
-  /* ── Differentiator block ── */
+  /* ── Differentiator ── */
   .diff-block {
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 56px 48px;
-    background: var(--surface);
-    margin-bottom: 120px;
-    position: relative;
-    overflow: hidden;
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: clamp(40px, 5vw, 64px); background: var(--surface);
+    position: relative; overflow: hidden;
   }
   .diff-block::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
     background: linear-gradient(90deg, transparent, var(--accent-mid), transparent);
   }
-
-  .diff-title {
-    font-size: clamp(16px, 1.6vw, 20px);
-    font-weight: 600;
-    color: var(--bright);
-    letter-spacing: 0.5px;
-    margin-bottom: 24px;
+  .diff-block::after {
+    content: ''; position: absolute; top: -40%; right: -10%; width: 420px; height: 420px;
+    background: radial-gradient(circle, rgba(0,212,238,0.06) 0%, transparent 70%);
+    pointer-events: none;
   }
-
-  .diff-text {
-    font-size: 13px;
-    font-weight: 300;
-    line-height: 2;
-    color: var(--dim);
-    max-width: 680px;
-  }
-  .diff-text em {
-    font-style: normal;
-    color: var(--text);
-    font-weight: 400;
-  }
-
-  /* ── Prompt example ── */
+  .diff-title { font-size: clamp(22px, 2.6vw, 30px); font-weight: 600; color: var(--bright); letter-spacing: 0.3px; margin-bottom: 24px; max-width: 620px; }
+  .diff-text { font-size: 15px; font-weight: 300; line-height: 2; color: var(--dim); max-width: 720px; position: relative; }
+  .diff-text em { font-style: normal; color: var(--text); font-weight: 400; }
   .prompt-example {
-    margin-top: 32px;
-    padding: 24px 28px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    line-height: 1.9;
-    color: var(--dim);
-    letter-spacing: 0.3px;
+    margin-top: 36px; padding: 24px 28px; background: var(--bg);
+    border: 1px solid var(--line); border-radius: 6px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.95;
+    color: var(--dim); letter-spacing: 0.3px; position: relative;
   }
-  .prompt-example .prompt-caret {
-    color: var(--accent);
-    opacity: 0.6;
-    margin-right: 8px;
-  }
+  .prompt-example .prompt-caret { color: var(--accent); opacity: 0.7; margin-right: 8px; }
+  .prompt-example .prompt-out { color: var(--text); }
 
-  /* ── Contact bar ── */
-  .contact-bar {
+  /* ── CTA / Contact ── */
+  .cta {
+    max-width: 1080px; margin: 0 auto; padding: 0 clamp(24px, 5vw, 40px) 40px;
+  }
+  .cta-inner {
+    border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+    background:
+      radial-gradient(ellipse 80% 120% at 50% -20%, rgba(0,212,238,0.08), transparent 60%),
+      var(--surface);
+    padding: clamp(48px, 6vw, 80px) clamp(28px, 5vw, 56px);
     text-align: center;
-    padding: 64px 0 40px;
-    border-top: 1px solid var(--border);
   }
-
-  .contact-bar .contact-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 8px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--ghost);
-    margin-bottom: 20px;
-    display: block;
-  }
-
-  .contact-bar a {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px; font-weight: 400;
-    letter-spacing: 3px; text-transform: uppercase;
-    color: var(--dim); text-decoration: none;
+  .cta h2 { font-size: clamp(26px, 3.6vw, 44px); font-weight: 600; color: var(--bright); line-height: 1.15; margin-bottom: 20px; }
+  .cta p { font-size: clamp(14px, 1.5vw, 17px); font-weight: 300; color: var(--dim); max-width: 540px; margin: 0 auto 40px; line-height: 1.8; }
+  .cta-link {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--bright); border-bottom: 1px solid var(--accent-mid); padding-bottom: 6px;
     transition: color 0.3s, text-shadow 0.3s;
-    position: relative;
   }
-  .contact-bar a:hover {
-    color: var(--accent);
-    text-shadow: 0 0 20px rgba(0,212,238,0.2);
-  }
-  .contact-bar a::after {
-    content: '';
-    position: absolute;
-    bottom: -4px; left: 0;
-    width: 0; height: 1px;
-    background: var(--accent);
-    transition: width 0.4s cubic-bezier(0.16,1,0.3,1);
-  }
-  .contact-bar a:hover::after { width: 100%; }
+  .cta-link:hover { color: var(--accent); text-shadow: 0 0 20px rgba(0,212,238,0.25); }
 
   /* ── Footer ── */
   .footer {
-    text-align: center;
-    padding: 0 40px 48px;
-    max-width: 960px;
-    margin: 0 auto;
+    border-top: 1px solid var(--line); margin-top: 40px;
+    padding: 40px clamp(24px, 5vw, 40px);
+    max-width: 1080px; margin-left: auto; margin-right: auto;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
   }
+  .footer .f-brand { display: flex; align-items: center; gap: 10px; }
+  .footer .f-word { font-weight: 700; font-size: 13px; letter-spacing: 4px; color: var(--text); }
   .footer p {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--ghost);
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 2px;
+    color: var(--ghost); text-transform: uppercase;
   }
 
-  /* ── Scroll reveal ── */
-  .reveal {
-    opacity: 0; transform: translateY(24px);
-    transition: opacity 1s cubic-bezier(0.16,1,0.3,1), transform 1s cubic-bezier(0.16,1,0.3,1);
-  }
-  .reveal.vis { opacity: 1; transform: translateY(0); }
+  /* ── Reveal (only hidden when JS is active) ── */
+  .js .reveal { opacity: 0; transform: translateY(28px); transition: opacity 1s cubic-bezier(0.16,1,0.3,1), transform 1s cubic-bezier(0.16,1,0.3,1); }
+  .js .reveal.vis { opacity: 1; transform: translateY(0); }
+  .reveal.d1 { transition-delay: 0.08s; }
+  .reveal.d2 { transition-delay: 0.16s; }
+  .reveal.d3 { transition-delay: 0.24s; }
 
   /* ── Keyframes ── */
-  @keyframes up {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
   @keyframes pulse { 0%,100% { opacity: 0.15; } 50% { opacity: 0.6; } }
-  
-  /* Inverted Dash Animation */
-  @keyframes ekgDash { 
-    0% { stroke-dashoffset: 280; } 
-    50% { stroke-dashoffset: 0; } 
-    100% { stroke-dashoffset: -280; } 
-  }
-  
-  @keyframes logoBreath {
-    0%,100% { filter: drop-shadow(0 0 4px rgba(0,212,238,0.12)); }
-    50% { filter: drop-shadow(0 0 14px rgba(0,212,238,0.28)); }
-  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes ekgDash { 0% { stroke-dashoffset: 280; } 50% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -280; } }
+  @keyframes logoBreath { 0%,100% { filter: drop-shadow(0 0 6px rgba(0,212,238,0.14)); } 50% { filter: drop-shadow(0 0 18px rgba(0,212,238,0.30)); } }
 
-  /* ── Responsive ── */
+  /* ── Hero emblem (HUD / radar mark) ── */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes spinRev { to { transform: rotate(-360deg); } }
+  @keyframes ping { 0% { transform: scale(0.62); opacity: 0; } 18% { opacity: 0.28; } 100% { transform: scale(1.06); opacity: 0; } }
+  @keyframes nodeGlow { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+  @keyframes ekgPulse { 0% { stroke-dashoffset: 96; } 55% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -96; } }
+
+  .logo-svg { animation: logoBreath 6s ease-in-out infinite; overflow: visible; }
+  .logo-svg [data-rot] { transform-box: view-box; transform-origin: 60px 60px; }
+  .r-spin   { animation: spin 30s linear infinite; }
+  .r-spin2  { animation: spinRev 42s linear infinite; }
+  .r-sweep  { animation: spin 4.6s linear infinite; }
+  .r-orbit  { animation: spin 19s linear infinite; }
+  .r-ping   { animation: ping 5.5s cubic-bezier(0.22,1,0.36,1) infinite; }
+  .ekg-line { animation: ekgPulse 4.2s cubic-bezier(0.4,0,0.2,1) infinite; }
+
+  @media (max-width: 860px) {
+    .stats { grid-template-columns: 1fr 1fr; }
+  }
   @media (max-width: 768px) {
     .pillars { grid-template-columns: 1fr; }
-    .pillar { padding: 40px 32px; }
     .pipeline { grid-template-columns: 1fr; }
-    .pipe-step { padding: 32px 28px; }
     .domains { grid-template-columns: 1fr; }
-    .domain + .domain {
-      padding-left: 0;
-      border-left: none;
-      border-top: 1px solid var(--border);
-      padding-top: 32px;
-    }
-    .diff-block { padding: 40px 28px; }
-    .content { padding: 0 24px 80px; }
-    .hero { padding: 60px 24px; }
   }
-
   @media (max-width: 480px) {
     .wordmark { letter-spacing: 8px; padding-left: 8px; }
     .tagline { letter-spacing: 3px; font-size: 9px; }
+    .stats { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; }
+    .reveal { opacity: 1; transform: none; }
   }
 </style>
-</head>
+<script src="https://cdn.moda.app/runtime-libs/tailwind-browser-4.1.13-index.global.min.js"></script><style data-moda-export-fonts="true">@font-face { font-family: 'Chakra Petch'; src: url("fonts/chakrapetch-extralight.ttf") format("truetype"); font-style: normal; font-weight: 200; font-display: swap; }
+@font-face { font-family: 'Chakra Petch'; src: url("../fonts/chakrapetch-extralightitalic.ttf") format("truetype"); font-style: italic; font-weight: 200; font-display: swap; }
+@font-face { font-family: 'Chakra Petch'; src: url("../fonts/chakrapetch-light.ttf") format("truetype"); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Chakra Petch'; src: url("../fonts/chakrapetch-lightitalic.ttf") format("truetype"); font-style: italic; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Chakra Petch'; src: url("../fonts/chakrapetch-regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Chakra Petch'; src: url("../fonts/chakrapetch-italic.ttf") format("truetype"); font-style: italic; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Chakra Petch'; src: url("../fonts/chakrapetch-medium.ttf") format("truetype"); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Chakra Petch'; src: url("../fonts/chakrapetch-mediumitalic.ttf") format("truetype"); font-style: italic; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Chakra Petch'; src: url("../fonts/chakrapetch-semibold.ttf") format("truetype"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Chakra Petch'; src: url("../fonts/chakrapetch-semibolditalic.ttf") format("truetype"); font-style: italic; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Chakra Petch'; src: url("../fonts/chakrapetch-bold.ttf") format("truetype"); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Chakra Petch'; src: url("../fonts/chakrapetch-bolditalic.ttf") format("truetype"); font-style: italic; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url("../fonts/ibmplexmono-thin.ttf") format("truetype"); font-style: normal; font-weight: 100; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url("../fonts/ibmplexmono-thinitalic.ttf") format("truetype"); font-style: italic; font-weight: 100; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url("../fonts/ibmplexmono-extralight.ttf") format("truetype"); font-style: normal; font-weight: 200; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url("../fonts/ibmplexmono-extralightitalic.ttf") format("truetype"); font-style: italic; font-weight: 200; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url("../fonts/ibmplexmono-light.ttf") format("truetype"); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url("../fonts/ibmplexmono-lightitalic.ttf") format("truetype"); font-style: italic; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url("../fonts/ibmplexmono-regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url("../fonts/ibmplexmono-italic.ttf") format("truetype"); font-style: italic; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url("../fonts/ibmplexmono-medium.ttf") format("truetype"); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url("../fonts/ibmplexmono-mediumitalic.ttf") format("truetype"); font-style: italic; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url("../fonts/ibmplexmono-semibold.ttf") format("truetype"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url("../fonts/ibmplexmono-semibolditalic.ttf") format("truetype"); font-style: italic; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url("../fonts/ibmplexmono-bold.ttf") format("truetype"); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url("../fonts/ibmplexmono-bolditalic.ttf") format("truetype"); font-style: italic; font-weight: 700; font-display: swap; }</style></head>
 <body>
 
 <canvas id="bg"></canvas>
-<div class="noise"></div>
+<div class="grid-overlay"></div>
 <div class="wash"></div>
+<div class="noise"></div>
 
-<main>
+<!-- Nav -->
+<nav class="nav" id="nav">
+  <a href="#top" class="nav-brand">
+    <svg width="30" height="30" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="44,10 78,28 44,46 10,28" fill="none" stroke="#3a3f48" stroke-width="1" stroke-linejoin="round"></polygon>
+      <polygon points="10,28 44,46 44,78 10,60" fill="none" stroke="#2a2e36" stroke-width="1" stroke-linejoin="round"></polygon>
+      <polygon points="78,28 78,60 44,78 44,46" fill="none" stroke="#30343c" stroke-width="1" stroke-linejoin="round"></polygon>
+      <circle cx="44" cy="46" r="3" fill="#00d4ee" opacity="0.6"></circle>
+    </svg>
+    <span class="nb-word">AID3D</span>
+  </a>
+  <div class="nav-links">
+    <a href="#capabilities">Capabilities</a>
+    <a href="#approach">Approach</a>
+    <a href="#settings">Settings</a>
+    <a href="#contact" class="nav-cta">Contact</a>
+  </div>
+</nav>
+
+<main id="top">
+
+  <!-- Hero -->
   <section class="hero">
+    <div class="hero-badge"><span class="dot"></span>Stealth · Trauma AI · Self-funded</div>
 
     <div class="logo-mark">
-      <svg width="92" height="92" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: logoBreath 5s ease-in-out infinite;">
+      <svg class="logo-svg" width="118" height="118" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AID3D emblem">
         <defs>
-          <filter id="g" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="2" result="b"/>
-            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          <filter id="lgGlow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="1.6" result="b"></feGaussianBlur>
+            <feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
           </filter>
+          <linearGradient id="hexGrad" x1="40" y1="30" x2="80" y2="90" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#5b6470"></stop>
+            <stop offset="1" stop-color="#2a2f38"></stop>
+          </linearGradient>
+          <radialGradient id="coreGrad" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0" stop-color="#38f0c9"></stop>
+            <stop offset="1" stop-color="#00d4ee"></stop>
+          </radialGradient>
         </defs>
 
-        <polygon points="44,10 78,28 44,46 10,28" fill="none" stroke="#3a3f48" stroke-width="0.7" stroke-linejoin="round"/>
-        <polygon points="10,28 44,46 44,78 10,60" fill="none" stroke="#2a2e36" stroke-width="0.7" stroke-linejoin="round"/>
-        <polygon points="78,28 78,60 44,78 44,46" fill="none" stroke="#30343c" stroke-width="0.7" stroke-linejoin="round"/>
+        <!-- single slow breathing pulse -->
+        <circle class="r-ping" data-rot="" cx="60" cy="60" r="46" fill="none" stroke="#00d4ee" stroke-width="1" opacity="0"></circle>
 
-        <line x1="44" y1="10" x2="44" y2="46" stroke="#2a2e36" stroke-width="0.4"/>
-        <line x1="10" y1="28" x2="44" y2="46" stroke="#2a2e36" stroke-width="0.4"/>
-        <line x1="78" y1="28" x2="44" y2="46" stroke="#2a2e36" stroke-width="0.4"/>
+        <!-- three dots, play-button formation -->
+        <g>
+          <circle cx="44" cy="40" r="3" fill="#00d4ee" filter="url(#lgGlow)" style="animation: nodeGlow 3s ease-in-out infinite;"></circle>
+          <circle cx="44" cy="80" r="3" fill="#00d4ee" filter="url(#lgGlow)" style="animation: nodeGlow 3s ease-in-out 1s infinite;"></circle>
+          <circle cx="82" cy="60" r="3" fill="#00d4ee" filter="url(#lgGlow)" style="animation: nodeGlow 3s ease-in-out 2s infinite;"></circle>
+        </g>
 
-        <circle cx="27" cy="36" r="2" fill="var(--accent)" opacity="0.4"/>
-        <circle cx="61" cy="36" r="2" fill="var(--accent)" opacity="0.3"/>
-        <circle cx="44" cy="62" r="2" fill="var(--accent)" opacity="0.35"/>
-
-        <line x1="27" y1="36" x2="44" y2="46" stroke="var(--accent)" stroke-width="0.6" opacity="0.25"/>
-        <line x1="61" y1="36" x2="44" y2="46" stroke="var(--accent)" stroke-width="0.6" opacity="0.25"/>
-        <line x1="44" y1="62" x2="44" y2="46" stroke="var(--accent)" stroke-width="0.6" opacity="0.25"/>
-
-        <polyline
-          points="8,44 14,44 20,36 26,54 34,26 42,60 50,32 58,50 66,44 80,44"
-          stroke="var(--accent)" stroke-width="1.2" fill="none"
-          stroke-linecap="round" stroke-linejoin="round"
-          stroke-dasharray="280" stroke-dashoffset="280"
-          style="animation: ekgDash 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;"
-          opacity="0.85" filter="url(#g)"/>
-
-        <circle cx="44" cy="46" r="2.5" fill="var(--accent)" opacity="0.45"/>
+        <!-- EKG signal -->
+        <polyline class="ekg-line" points="40,60 47,60 51,52 56,70 60,46 64,72 69,56 73,60 80,60" stroke="url(#coreGrad)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="96" stroke-dashoffset="96" filter="url(#lgGlow)"></polyline>
       </svg>
     </div>
 
@@ -520,223 +551,236 @@
       <em>Predicting life-saving interventions</em> before the window closes — for every casualty, every setting, every stage of care.
     </p>
 
+    <div class="hero-actions">
+      <a href="#contact" class="btn btn-primary">Request a Briefing
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+      </a>
+      <a href="#approach" class="btn btn-ghost">See the System</a>
+    </div>
+
     <div class="scroll-cue">
       <div class="bar"></div>
       <span>Scroll</span>
     </div>
   </section>
 
-  <div class="content">
+  <!-- Marquee strip -->
+  <div class="strip">
+    <div class="strip-track">
+      <span>Invasive Airway</span><span>Blood Products</span><span>Chest Decompression</span><span>Surgical Intervention</span><span>Vasopressors</span><span>Real-Time Prediction</span>
+      <span>Invasive Airway</span><span>Blood Products</span><span>Chest Decompression</span><span>Surgical Intervention</span><span>Vasopressors</span><span>Real-Time Prediction</span>
+    </div>
+  </div>
 
-    <div class="section-label reveal">Capabilities</div>
+  <!-- Capabilities -->
+  <section class="content" id="capabilities">
+    <div class="section-head reveal">
+      <div class="section-label">Capabilities</div>
+      <h2 class="section-title">Built for the field. Designed for the clinic.</h2>
+      <p class="section-sub">A self-contained intelligence layer that turns the data trauma teams already capture into decisive, actionable predictions — wherever care happens.</p>
+    </div>
 
-    <div class="pillars reveal">
-      <div class="pillar">
+    <div class="pillars">
+      <div class="pillar reveal d1">
+        <div class="pillar-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6z"></path><path d="m9 12 2 2 4-4"></path></svg>
+        </div>
         <div class="pillar-label">Deployment</div>
-        <h2 class="pillar-title">Field Ready</h2>
-        <p class="pillar-desc">Self-contained operation at point of injury. Zero configuration — powers on and predicts immediately. Runs on standard hardware including field laptops and ruggedized tablets. No special sensors required.</p>
+        <h3 class="pillar-title">Field Ready</h3>
+        <p class="pillar-desc">Self-contained operation at the point of injury. Zero configuration — powers on and predicts immediately. Runs on standard hardware including field laptops and ruggedized tablets. No special sensors required.</p>
       </div>
-      <div class="pillar">
+      <div class="pillar reveal d2">
+        <div class="pillar-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"></path></svg>
+        </div>
         <div class="pillar-label">Intelligence</div>
-        <h2 class="pillar-title">AI-Driven Discovery</h2>
+        <h3 class="pillar-title">AI-Driven Discovery</h3>
         <p class="pillar-desc">Advanced machine learning that unlocks hidden, clinically meaningful features within complex medical data — using the information trauma teams already capture. Purpose-built to find the patterns that save lives.</p>
       </div>
     </div>
+  </section>
 
-    <div class="section-label reveal">Our Approach</div>
+  <!-- Approach -->
+  <section class="content" id="approach" style="padding-top:0;">
+    <div class="section-head reveal">
+      <div class="section-label">Our Approach</div>
+      <h2 class="section-title">From raw clinical data to medic-ready decisions.</h2>
+      <p class="section-sub">Three stages turn routine inputs into predictive intelligence that maps directly to what responders can act on.</p>
+    </div>
 
-    <div class="pipeline reveal">
-      <div class="pipe-step">
+    <div class="pipeline">
+      <div class="pipe-step reveal d1">
         <div class="pipe-num">01</div>
         <h3 class="pipe-title">Hidden Feature Discovery</h3>
-        <p class="pipe-desc">Our AI surfaces patterns buried in complex, multi-dimensional medical data — clinically meaningful features that conventional analysis methods cannot detect, turning routine clinical data into predictive intelligence.</p>
+        <p class="pipe-desc">Our AI surfaces patterns buried in complex, multi-dimensional medical data — clinically meaningful features that conventional analysis cannot detect, turning routine clinical data into predictive intelligence.</p>
       </div>
-      <div class="pipe-step">
+      <div class="pipe-step reveal d2">
         <div class="pipe-num">02</div>
         <h3 class="pipe-title">Complete LSI Coverage</h3>
-        <p class="pipe-desc">Predictions span all five life-saving intervention categories: Invasive Airway, Blood Products, Chest Decompression, Surgical, and Vasopressors. Continuous processing aligned to clinical monitoring cadences.</p>
+        <p class="pipe-desc">Predictions span all five life-saving intervention categories. Continuous processing aligned to clinical monitoring cadences keeps the picture current as a patient's condition evolves.</p>
       </div>
-      <div class="pipe-step">
+      <div class="pipe-step reveal d3">
         <div class="pipe-num">03</div>
         <h3 class="pipe-title">Medic-Ready Output</h3>
-        <p class="pipe-desc">Results map directly to the interventions medics are trained and equipped to perform — actionable decision support, not abstract scores. Designed to complement existing clinical protocols and workflows.</p>
+        <p class="pipe-desc">Results map directly to the interventions medics are trained and equipped to perform — actionable decision support, not abstract scores. Designed to complement existing protocols and workflows.</p>
       </div>
     </div>
 
+    <div class="lsi-row reveal">
+      <span class="lsi-tag"><span class="dot"></span>Invasive Airway</span>
+      <span class="lsi-tag"><span class="dot"></span>Blood Products</span>
+      <span class="lsi-tag"><span class="dot"></span>Chest Decompression</span>
+      <span class="lsi-tag"><span class="dot"></span>Surgical</span>
+      <span class="lsi-tag"><span class="dot"></span>Vasopressors</span>
+    </div>
+  </section>
+
+  <!-- Settings / Domains -->
+  <section class="content" id="settings" style="padding-top:0;">
+    <div class="section-head reveal">
+      <div class="section-label">Every Setting</div>
+      <h2 class="section-title">One system, the full continuum of care.</h2>
+      <p class="section-sub">From the point of injury to the trauma bay, AID3D delivers the same predictive edge across every stage.</p>
+    </div>
+
+    <div class="domains">
+      <div class="domain reveal d1">
+        <svg class="domain-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 12h4l2-6 4 12 2-6h6"></path></svg>
+        <h3 class="domain-title">Pre-Hospital</h3>
+        <p class="domain-desc">Predictive support at the point of injury and during transport — guiding the first critical decisions when minutes matter most.</p>
+      </div>
+      <div class="domain reveal d2">
+        <svg class="domain-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 4v16M4 12h16"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
+        <h3 class="domain-title">Combat &amp; Austere</h3>
+        <p class="domain-desc">Self-contained operation in the most demanding environments — no connectivity, no special sensors, no new workflow required.</p>
+      </div>
+      <div class="domain reveal d3">
+        <svg class="domain-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 21V8l8-5 8 5v13"></path><path d="M9 21v-6h6v6"></path></svg>
+        <h3 class="domain-title">Clinical &amp; Trauma Bay</h3>
+        <p class="domain-desc">Continuous, real-time intelligence that complements clinical protocols — aligning predictions to the cadences teams already follow.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="content" style="padding-top:0;">
+    <div class="stats reveal">
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">LSI Categories</div></div>
+      <div class="stat"><div class="stat-num">0</div><div class="stat-label">Special Sensors</div></div>
+      <div class="stat"><div class="stat-num">RT</div><div class="stat-label">Real-Time Output</div></div>
+      <div class="stat"><div class="stat-num">∞</div><div class="stat-label">Settings of Care</div></div>
+    </div>
+  </section>
+
+  <!-- Differentiator -->
+  <section class="content" style="padding-top:0;">
     <div class="diff-block reveal">
-      <h2 class="diff-title">From Competition to Combat and Clinic</h2>
+      <div class="section-label">Why AID3D</div>
+      <h2 class="diff-title">From competition to combat and clinic.</h2>
       <p class="diff-text">
-        AID3D is a <em>self-funded, purpose-built system</em> for one mission: predicting which life-saving interventions a trauma patient will need before the critical window closes. We leverage advanced AI and machine learning to <em>extract deep insights from data trauma teams already capture</em> — no special sensors, no new workflows. Our system ingests existing clinical data natively and delivers results in real time, aligned to the cadences clinicians already follow. Built from the ground up to <em>complement — not replace</em> — existing TCCC and trauma bay protocols.
+        AID3D is a <em>self-funded, purpose-built system</em> for one mission: predicting which life-saving interventions a trauma patient will need before the critical window closes. We leverage advanced AI and machine learning to <em>extract deep insights from data trauma teams already capture</em> — no special sensors, no new workflows. Our system ingests existing clinical data natively and delivers results in real time, aligned to the cadences clinicians already work within.
       </p>
-    </div>
-
-    <div class="section-label reveal">Transition Pathways</div>
-
-    <div class="domains reveal">
-      <div class="domain">
-        <svg class="domain-icon" width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
-          <path d="M18 4 L30 10 L30 18 C30 26 24 32 18 34 C12 32 6 26 6 18 L6 10 Z" stroke="var(--dim)" stroke-width="0.8" fill="none"/>
-          <line x1="18" y1="14" x2="18" y2="24" stroke="var(--accent)" stroke-width="1" opacity="0.6"/>
-          <line x1="13" y1="19" x2="23" y2="19" stroke="var(--accent)" stroke-width="1" opacity="0.6"/>
-        </svg>
-        <h3 class="domain-title">Military Trauma</h3>
-        <p class="domain-desc">Casualty collection point triage support through forward surgical teams — deployable across Role 1 through Role 3 military medical care.</p>
-      </div>
-
-      <div class="domain">
-        <svg class="domain-icon" width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
-          <circle cx="12" cy="10" r="4" stroke="var(--dim)" stroke-width="0.8" fill="none"/>
-          <circle cx="24" cy="10" r="4" stroke="var(--dim)" stroke-width="0.8" fill="none"/>
-          <path d="M4 28 C4 22 8 18 12 18 C14 18 16 19 17 20" stroke="var(--dim)" stroke-width="0.8" fill="none"/>
-          <path d="M32 28 C32 22 28 18 24 18 C22 18 20 19 19 20" stroke="var(--dim)" stroke-width="0.8" fill="none"/>
-          <line x1="18" y1="22" x2="18" y2="30" stroke="var(--accent)" stroke-width="0.8" opacity="0.5"/>
-          <line x1="14" y1="26" x2="22" y2="26" stroke="var(--accent)" stroke-width="0.8" opacity="0.5"/>
-        </svg>
-        <h3 class="domain-title">Mass Casualty</h3>
-        <p class="domain-desc">Civilian MCI, disaster medicine, and emergency department patient surge — scalable decision support when resources are stretched thin.</p>
-      </div>
-
-      <div class="domain">
-        <svg class="domain-icon" width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
-          <rect x="6" y="6" width="24" height="24" rx="3" stroke="var(--dim)" stroke-width="0.8" fill="none"/>
-          <circle cx="18" cy="18" r="6" stroke="var(--dim)" stroke-width="0.8" fill="none"/>
-          <circle cx="18" cy="18" r="2" stroke="var(--accent)" stroke-width="0.8" fill="none" opacity="0.5"/>
-          <line x1="18" y1="6" x2="18" y2="12" stroke="var(--dim)" stroke-width="0.6"/>
-          <line x1="18" y1="24" x2="18" y2="30" stroke="var(--dim)" stroke-width="0.6"/>
-          <line x1="6" y1="18" x2="12" y2="18" stroke="var(--dim)" stroke-width="0.6"/>
-          <line x1="24" y1="18" x2="30" y2="18" stroke="var(--dim)" stroke-width="0.6"/>
-        </svg>
-        <h3 class="domain-title">DoD Integration</h3>
-        <p class="domain-desc">Designed to complement existing TCCC and trauma bay protocols — integrating into current military and civilian medical workflows rather than replacing them.</p>
+      <div class="prompt-example">
+        <div><span class="prompt-caret">&gt;</span>ingest --vitals --labs --stream</div>
+        <div><span class="prompt-caret">&gt;</span>predict --lsi all --window critical</div>
+        <div class="prompt-out"><span class="prompt-caret">✦</span>Blood Products: <strong style="color:var(--accent)">HIGH</strong> · Chest Decompression: ELEVATED · Airway: monitor</div>
       </div>
     </div>
+  </section>
 
-    <div class="section-label reveal">Team</div>
-
-    <div class="pillars reveal" style="margin-bottom: 80px;">
-      <div class="pillar">
-        <div class="pillar-label">Co-Founder</div>
-        <h2 class="pillar-title">Alexander N. Dimopoulos</h2>
-        <p class="pillar-desc">NIST &middot; NASA JPL &middot; AFRL &middot; DARPA SubT Challenge</p>
-      </div>
-      <div class="pillar">
-        <div class="pillar-label">Co-Founder</div>
-        <h2 class="pillar-title">Michidmaa Maral</h2>
-        <p class="pillar-desc">ML Research &middot; Physiological Pattern Recognition &middot; Google SoC</p>
-      </div>
+  <!-- CTA / Contact -->
+  <section class="cta" id="contact">
+    <div class="cta-inner reveal">
+      <div class="section-label" style="justify-content:center;">Get in Touch</div>
+      <h2>Predict the intervention.<br>Protect the window.</h2>
+      <p>We work with trauma programs, defense medical teams, and research partners advancing the future of casualty care. Reach out for a confidential briefing.</p>
+      <a href="mailto:contact@aid3d-triage.com" class="cta-link">contact@aid3d-triage.com</a>
     </div>
+  </section>
 
-    <div class="contact-bar reveal">
-      <span class="contact-label">Get in touch</span>
-      <a href="mailto:alex@aid3d-triage.com">alex@aid3d-triage.com</a>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="f-brand">
+      <svg width="22" height="22" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="44,10 78,28 44,46 10,28" fill="none" stroke="#3a3f48" stroke-width="1.2" stroke-linejoin="round"></polygon>
+        <polygon points="10,28 44,46 44,78 10,60" fill="none" stroke="#2a2e36" stroke-width="1.2" stroke-linejoin="round"></polygon>
+        <polygon points="78,28 78,60 44,78 44,46" fill="none" stroke="#30343c" stroke-width="1.2" stroke-linejoin="round"></polygon>
+      </svg>
+      <span class="f-word">AID3D</span>
     </div>
+    <p>© 2024 AID3D · Autonomous Injury Detection &amp; Decision Delivery</p>
+    <p>Built for the field · Designed for the clinic</p>
+  </footer>
 
-  </div>
 </main>
 
-<div class="footer">
-  <p>&copy; 2026 AID3D &mdash; All rights reserved</p>
-</div>
-
 <script>
-// ─── Minimal particle field ───
-(function(){
-  const c = document.getElementById('bg');
-  const x = c.getContext('2d');
-  let w, h, pts = [];
-  let raf;
+  // Enable JS-gated reveal animations (content stays visible if JS is off)
+  document.documentElement.classList.add('js');
 
-  function sz(){
-    w = c.width = innerWidth;
-    h = c.height = innerHeight;
-  }
-  sz();
-  window.addEventListener('resize', sz);
+  // Nav scroll state
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 40);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
 
-  const N = Math.min(45, Math.floor(innerWidth / 30));
-  const D = 150;
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-  for(let i = 0; i < N; i++){
-    pts.push({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      vx: (Math.random() - 0.5) * 0.18,
-      vy: (Math.random() - 0.5) * 0.18,
-      r: Math.random() * 1.2 + 0.3,
-      o: Math.random() * 0.12 + 0.04
-    });
-  }
+  // Animated network background
+  (function () {
+    const canvas = document.getElementById('bg');
+    const ctx = canvas.getContext('2d');
+    let w, h, dpr, nodes = [];
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  let mx = -999, my = -999;
-  document.addEventListener('mousemove', function(e){
-    mx = e.clientX;
-    my = e.clientY;
-  });
-
-  function loop(){
-    x.clearRect(0, 0, w, h);
-    for(let i = 0; i < pts.length; i++){
-      const p = pts[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      if(p.x < 0 || p.x > w) p.vx *= -1;
-      if(p.y < 0 || p.y > h) p.vy *= -1;
-
-      const dx = p.x - mx, dy = p.y - my, dd = Math.sqrt(dx * dx + dy * dy);
-      if(dd < 120){ p.x += dx * 0.006; p.y += dy * 0.006; }
-
-      x.beginPath();
-      x.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      x.fillStyle = 'rgba(0,212,238,' + p.o + ')';
-      x.fill();
-
-      for(let j = i + 1; j < pts.length; j++){
-        const q = pts[j], d = Math.hypot(p.x - q.x, p.y - q.y);
-        if(d < D){
-          x.beginPath();
-          x.moveTo(p.x, p.y);
-          x.lineTo(q.x, q.y);
-          x.strokeStyle = 'rgba(0,212,238,' + (0.035 * (1 - d / D)) + ')';
-          x.lineWidth = 0.4;
-          x.stroke();
-        }
-      }
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = canvas.width = innerWidth * dpr;
+      h = canvas.height = innerHeight * dpr;
+      canvas.style.width = innerWidth + 'px';
+      canvas.style.height = innerHeight + 'px';
+      const count = Math.min(70, Math.floor((innerWidth * innerHeight) / 22000));
+      nodes = Array.from({ length: count }, () => ({
+        x: Math.random() * w, y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.18 * dpr,
+        vy: (Math.random() - 0.5) * 0.18 * dpr,
+        r: (Math.random() * 1.4 + 0.6) * dpr
+      }));
     }
-    raf = requestAnimationFrame(loop);
-  }
-  loop();
 
-  document.addEventListener('visibilitychange', function(){
-    if(document.hidden){ cancelAnimationFrame(raf); }
-    else { loop(); }
-  });
-})();
-
-// ─── Scroll reveal ───
-(function(){
-  const els = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if(entry.isIntersecting){
-        entry.target.classList.add('vis');
-        observer.unobserve(entry.target);
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      const maxD = 150 * dpr;
+      for (let i = 0; i < nodes.length; i++) {
+        const a = nodes[i];
+        a.x += a.vx; a.y += a.vy;
+        if (a.x < 0 || a.x > w) a.vx *= -1;
+        if (a.y < 0 || a.y > h) a.vy *= -1;
+        for (let j = i + 1; j < nodes.length; j++) {
+          const b = nodes[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const d = Math.hypot(dx, dy);
+          if (d < maxD) {
+            ctx.strokeStyle = `rgba(0,212,238,${(1 - d / maxD) * 0.10})`;
+            ctx.lineWidth = 0.6 * dpr;
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+          }
+        }
+        ctx.fillStyle = 'rgba(0,212,238,0.30)';
+        ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2); ctx.fill();
       }
-    });
-  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      if (!reduce) requestAnimationFrame(draw);
+    }
 
-  els.forEach(function(el){ observer.observe(el); });
-})();
-
-// ─── Smooth scroll-cue fade on scroll ───
-(function(){
-  const cue = document.querySelector('.scroll-cue');
-  if(!cue) return;
-  window.addEventListener('scroll', function(){
-    const t = Math.min(window.scrollY / 300, 1);
-    cue.style.opacity = 1 - t;
-  }, { passive: true });
-})();
+    resize();
+    window.addEventListener('resize', resize);
+    draw();
+  })();
 </script>
 
-</body>
-</html>
+
+</body></html>
